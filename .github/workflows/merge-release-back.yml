@@ -27,34 +27,6 @@ jobs:
         env:
           HEAD_COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
 
-      - name: Checkout develop branch
-        uses: actions/checkout@v2
-        with:
-          ref: 'develop'
-
-      - name: Adding github workspace as safe directory
-        # See issue https://github.com/actions/checkout/issues/760
-        run: git config --global --add safe.directory /__w/alexandre-bolduc-braze/gha-test
-
-- name: Attempt to merge the release branch commit and push to develop
-        run: |
-          git fetch --unshallow origin develop "${{ github.event.ref }}"
-          git config user.name "${{ github.event.head_commit.author.name }}"
-          git config user.email "${{ github.event.head_commit.author.email }}"
-
-          set +e
-          if git merge "origin/${{ env.short_ref }}" && git push origin develop ; then
-            echo "merge_failed=" >> $GITHUB_ENV
-          else
-            git reset --hard
-            echo "merge_failed=true" >> $GITHUB_ENV
-          fi
-
-      - name: Adding github workspace as safe directory
-        # See issue https://github.com/actions/checkout/issues/760
-        run: git config --global --add safe.directory /__w/alexandre-bolduc-braze/gha-test
-
-
       - name: Checkout
         uses: actions/checkout@v2
 
