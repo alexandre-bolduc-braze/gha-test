@@ -27,11 +27,12 @@ jobs:
         env:
           HEAD_COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
 
-      - name: Checkout
-        uses: actions/checkout@v2
-
       - name: work around permission issue
         run: git config --global --add safe.directory /__w/alexandre-bolduc-braze/gha-test
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -45,7 +46,6 @@ jobs:
       - name: Create Pull Request
         id: create-pr
         uses: repo-sync/pull-request@v2
-        run: git config --global --add safe.directory /__w/alexandre-bolduc-braze/gha-test
         with:
           destination_branch: develop
           source_branch: 'merge-${{ env.short_ref }}-${{ github.event.after }}'
