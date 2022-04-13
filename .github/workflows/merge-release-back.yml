@@ -33,9 +33,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Create a new branch for the pull request
         uses: peterjgrainger/action-create-branch@v2.0.1
         env:
