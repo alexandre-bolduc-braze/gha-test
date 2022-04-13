@@ -1,8 +1,6 @@
 # When a new push happens to a release-N branch (after its initial creation),
 # open a pull request merging the latest commit back to the `develop` branch.
 
----
-
 on:
   push:
     branches: ['release-[0-9]+']
