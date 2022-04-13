@@ -1,5 +1,5 @@
-# When a new push happens to a release-N branch,
-# create a pull request merging the latest commit back to the `develop` branch.
+# When a new push happens to a release-N branch (after its initial creation),
+# open a pull request merging the latest commit back to the `develop` branch.
 
 ---
 
@@ -50,46 +50,47 @@ jobs:
             echo "merge_failed=true" >> $GITHUB_ENV
           fi
 
-      - name: Checkout the ref instead of develop
-        if: ${{ env.merge_failed == 'true' }}
+      - name: Adding github workspace as safe directory
+        # See issue https://github.com/actions/checkout/issues/760
+        run: git config --global --add safe.directory /__w/alexandre-bolduc-braze/gha-test
+
+
+      - name: Checkout
         uses: actions/checkout@v2
 
       - name: Create a new branch for the pull request
-        if: ${{ env.merge_failed == 'true' }}
         uses: peterjgrainger/action-create-branch@v2.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           branch: 'merge-${{ env.short_ref }}-${{ github.event.after }}'
 
-      - name: Checkout the new branch
-        if: ${{ env.merge_failed == 'true' }}
-        uses: actions/checkout@v2
-        with:
-          branch: 'merge-${{ env.short_ref }}-${{ github.event.after }}'
-
       - name: Create Pull Request
         id: create-pr
-        if: ${{ env.merge_failed == 'true' }}
         uses: repo-sync/pull-request@v2
         with:
           destination_branch: develop
           source_branch: 'merge-${{ env.short_ref }}-${{ github.event.after }}'
           pr_title: 'Merge Hotfix ${{ env.short_sha }} for ${{ env.short_ref }} back into develop'
+          # if you modify the first line with "you are responsible", please make sure to also modify
+          # the AUTHOR_REGEX regex in `git_operations/github_service.py`
           pr_body: |
-            @${{ github.event.head_commit.author.username }}, you are responsible for merging your recent hotfix back to develop:
+            @${{ github.event.head_commit.author.username }}, you are responsible for your recent hotfix getting merged back to develop:
 
             Will merge ${{ env.short_sha }}: ${{ env.head_commit_message }}
 
+            ### Mergeback Instructions
             * Resolve merge conflicts, if any exist
-            * After the tests pass, approve this PR
-            * Make sure the merge selector says \`Create a merge commit\`
-            * Merge
+              * You are responsible for determining the correct merged state
+            * Approve this PR
+            * After the tests pass and there is an approval, this PR will be auto-merged
+            * If the tests don't pass (or some other circumstances) and auto-merge does not occur, you must resolve the problems and manually Merge
+              * This PR should be merged regardless of the circumstances. Even if there's no diff, if other hotfixes are included, etc.
 
             See https://confluence.braze.com/display/ENG/Hotfix+Release+Process for further details
-          pr_reviewer: '${{ github.event.head_commit.author.username }},Appboy/application-infrastructure'
+          pr_reviewer: '${{ github.event.head_commit.author.username }},jasonpenny'
           pr_label: 'hotfix-merge-to-develop'
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.AUTOMERGE_TOKEN }}
 
       - name: Setup ruby
         uses: ruby/setup-ruby@v1
@@ -100,4 +101,4 @@ jobs:
       - name: Mark Pull Request as Auto-Merge
         run: ruby .github/workflows/scripts/enable_auto_merge.rb "${{ steps.create-pr.outputs.pr_number }}"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.AUTOMERGE_TOKEN }}
