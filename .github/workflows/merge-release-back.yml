@@ -27,8 +27,8 @@ jobs:
         env:
           HEAD_COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
 
-      - name: work around permission issue
-        run: git config --global --add safe.directory /__w/alexandre-bolduc-braze/gha-test
+#      - name: work around permission issue
+#        run: git config --global --add safe.directory /__w/alexandre-bolduc-braze/gha-test
 
       - name: Checkout
         uses: actions/checkout@v3
