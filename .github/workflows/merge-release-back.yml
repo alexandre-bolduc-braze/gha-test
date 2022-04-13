@@ -63,7 +63,7 @@ jobs:
               * This PR should be merged regardless of the circumstances. Even if there's no diff, if other hotfixes are included, etc.
 
             See https://confluence.braze.com/display/ENG/Hotfix+Release+Process for further details
-          pr_reviewer: '${{ github.event.head_commit.author.username }},jasonpenny'
+          pr_reviewer: '${{ github.event.head_commit.author.username }}'
           pr_label: 'hotfix-merge-to-develop'
           github_token: ${{ secrets.AUTOMERGE_TOKEN }}
 
