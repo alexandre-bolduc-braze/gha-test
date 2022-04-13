@@ -32,6 +32,8 @@ jobs:
 
       - name: work around permission issue
         run: git config --global --add safe.directory /__w/alexandre-bolduc-braze/gha-test
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create a new branch for the pull request
         uses: peterjgrainger/action-create-branch@v2.0.1
@@ -43,6 +45,7 @@ jobs:
       - name: Create Pull Request
         id: create-pr
         uses: repo-sync/pull-request@v2
+        run: git config --global --add safe.directory /__w/alexandre-bolduc-braze/gha-test
         with:
           destination_branch: develop
           source_branch: 'merge-${{ env.short_ref }}-${{ github.event.after }}'
