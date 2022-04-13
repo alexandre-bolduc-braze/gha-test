@@ -1,4 +1,6 @@
 nope
+hola
+hello
 more
 auto-merge?
 change some lines
